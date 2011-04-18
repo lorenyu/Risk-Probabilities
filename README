@@ -1,0 +1,11 @@
+RiskProbabilities
+Python library for computing probabilities in the board game, Risk
+Author: Loren Yu <yuloren@gmail.com>
+
+Release notes:
+-None
+
+Todos:
+- Name methods better names
+
+
