@@ -32,7 +32,7 @@ class RiskProbabilityCalculator:
         attackers_lost = total_casualties - defenders_lost
         return attackers_lost, defenders_lost
 
-    def computeProb(self, (num_attackers, num_defenders), (attackers_lost, defenders_lost)):
+    def compute_prob(self, (num_attackers, num_defenders), (attackers_lost, defenders_lost)):
         attackerRolls = self.diceRolls[min(num_attackers, 3)]
         defenderRolls = self.diceRolls[min(num_defenders, 2)]
         numEvents = sum([1 if self.outcome(attackers, defenders) == (attackers_lost, defenders_lost) else 0
@@ -49,7 +49,7 @@ class RiskProbabilityCalculator:
                     defenders_lost = total_casualties-attackers_lost
                     given = (num_attackers, num_defenders)
                     outcome = (attackers_lost, defenders_lost)
-                    probabilities[(given, outcome)] = self.computeProb(given, outcome)
+                    probabilities[(given, outcome)] = self.compute_prob(given, outcome)
         return probabilities
 
     def probability_when_attacking(self, (attackers_lost, defenders_lost), (num_attackers, num_defenders)):
