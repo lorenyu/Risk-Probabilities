@@ -7,7 +7,7 @@ def mult(a,x):
 class RiskProbabilityCalculator:
 
     def __init__(self):
-        def generateDiceRolls(numDice):
+        def generate_dice_rolls(numDice):
             if numDice <= 0:
                 return []
             diceRolls = [[(i,) for i in range(1,7)] for die in range(0,numDice)]
@@ -15,70 +15,70 @@ class RiskProbabilityCalculator:
                                [x + y for x in diceRolls for y in dieRolls], diceRolls)
             return diceRolls
 
-        self.diceRolls = [generateDiceRolls(i) for i in range(0, 4)]
-        self.probabilities = self.generateProbabilities()
+        self.diceRolls = [generate_dice_rolls(i) for i in range(0, 4)]
+        self.probabilities = self.generate_probabilities()
         pass
 
-    def transition((numAttackers,numDefenders), (numAttackersLost, numDefendersLost)):
-        print (numAttackers,numDefenders), (numAttackersLost, numDefendersLost)
+    def transition((num_attackers,num_defenders), (num_attackers_lost, num_defenders_lost)):
+        print (num_attackers,num_defenders), (num_attackers_lost, num_defenders_lost)
 
-    def computePTransition((numAttackers,numDefenders), (numAttackersLost, numDefendersLost)):
+    def computePTransition((num_attackers,num_defenders), (num_attackers_lost, num_defenders_lost)):
         pass
 
     def outcome(self, attackers, defenders):
-        totalCasualties = min(len(attackers), len(defenders))
+        total_casualties = min(len(attackers), len(defenders))
         attackers = sorted(attackers, reverse=True)
         defenders = sorted(defenders, reverse=True)
-        defendersLost = sum([(1 if attacker > defender else 0) for (attacker, defender) in zip(attackers, defenders)])
-        attackersLost = totalCasualties - defendersLost
-        return attackersLost, defendersLost
+        defenders_lost = sum([(1 if attacker > defender else 0) for (attacker, defender) in zip(attackers, defenders)])
+        attackers_lost = total_casualties - defenders_lost
+        return attackers_lost, defenders_lost
 
-    def computeProb(self, (numAttackers, numDefenders), (attackersLost, defendersLost)):
-        attackerRolls = self.diceRolls[min(numAttackers, 3)]
-        defenderRolls = self.diceRolls[min(numDefenders, 2)]
-        numEvents = sum([1 if self.outcome(attackers, defenders) == (attackersLost, defendersLost) else 0
+    def computeProb(self, (num_attackers, num_defenders), (attackers_lost, defenders_lost)):
+        attackerRolls = self.diceRolls[min(num_attackers, 3)]
+        defenderRolls = self.diceRolls[min(num_defenders, 2)]
+        numEvents = sum([1 if self.outcome(attackers, defenders) == (attackers_lost, defenders_lost) else 0
              for attackers in attackerRolls
              for defenders in defenderRolls])
         return float(numEvents) / (len(attackerRolls) * len(defenderRolls))
 
-    def generateProbabilities(self):
+    def generate_probabilities(self):
         probabilities = {}
-        for numAttackers in range(1,4):
-            for numDefenders in range(1,3):
-                totalCasualties = min(numAttackers, numDefenders)
-                for attackersLost in range(0, totalCasualties+1):
-                    defendersLost = totalCasualties-attackersLost
-                    given = (numAttackers, numDefenders)
-                    outcome = (attackersLost, defendersLost)
+        for num_attackers in range(1,4):
+            for num_defenders in range(1,3):
+                total_casualties = min(num_attackers, num_defenders)
+                for attackers_lost in range(0, total_casualties+1):
+                    defenders_lost = total_casualties-attackers_lost
+                    given = (num_attackers, num_defenders)
+                    outcome = (attackers_lost, defenders_lost)
                     probabilities[(given, outcome)] = self.computeProb(given, outcome)
         return probabilities
 
-    def probability_when_attacking(self, (attackersLost, defendersLost), (numAttackers, numDefenders)):
-        return self.probabilities[(numAttackers, numDefenders), (attackersLost, defendersLost)]
+    def probability_when_attacking(self, (attackers_lost, defenders_lost), (num_attackers, num_defenders)):
+        return self.probabilities[(num_attackers, num_defenders), (attackers_lost, defenders_lost)]
 
-    def expected_armies_lost_when_attacking(self, numAttackers, numDefenders):
+    def expected_armies_lost_when_attacking(self, num_attackers, num_defenders):
         result = (0.0, 0.0)
-        numLosses = min(numAttackers, numDefenders)
-        # E = sum P(attackersLost,defendersLost) * (attackersLost, defendersLost)
-        for (attackersLost, defendersLost) in [(attackersLost, defendersLost) for attackersLost in range(0,3) for defendersLost in range(0,3)]:
-            if attackersLost + defendersLost != numLosses:
+        numLosses = min(num_attackers, num_defenders)
+        # E = sum P(attackers_lost,defenders_lost) * (attackers_lost, defenders_lost)
+        for (attackers_lost, defenders_lost) in [(attackers_lost, defenders_lost) for attackers_lost in range(0,3) for defenders_lost in range(0,3)]:
+            if attackers_lost + defenders_lost != numLosses:
                 continue
-            prob = self.probability_when_attacking((attackersLost, defendersLost), (numAttackers, numDefenders))
-            result = add(result, mult(prob, (attackersLost, defendersLost)))
+            prob = self.probability_when_attacking((attackers_lost, defenders_lost), (num_attackers, num_defenders))
+            result = add(result, mult(prob, (attackers_lost, defenders_lost)))
         return result
 
-    def probability_when_attacking_territory(self, (attackersLeft, defendersLeft), (attackingCountry, defendingCountry, attackingStrategy)):
-        def Sa(attackingCountry, defendingCountry):
-            return min(3, attackingCountry - 1, attackingStrategy(attackingCountry, defendingCountry)) if (defendingCountry > 0 and attackingCountry > 1) else 0
-        a1 = attackingCountry # initial number of units in attacking country
-        d1 = defendingCountry # initial number of units in defending country
-        a2 = attackersLeft # number of attacking units left
-        d2 = defendersLeft # number of defending units left
+    def probability_when_attacking_territory(self, (attackers_left, defenders_left), (attacking_country, defending_country, attacking_strategy)):
+        def Sa(attacking_country, defending_country):
+            return min(3, attacking_country - 1, attacking_strategy(attacking_country, defending_country)) if (defending_country > 0 and attacking_country > 1) else 0
+        a1 = attacking_country # initial number of units in attacking country
+        d1 = defending_country # initial number of units in defending country
+        a2 = attackers_left # number of attacking units left
+        d2 = defenders_left # number of defending units left
         p = [[0.0]*(d1 - d2 + 1) for i in range(a1 - a2 + 1)]
         p[0][0] = 1 if Sa(a2, d2) == 0 else 0
         
-        for i in range(0, a1 - a2 + 1): # i = num units in attacking country - attackersLeft
-            for j in range(0, d1 - d2 + 1): # j = num units in defending country - defendersLeft
+        for i in range(0, a1 - a2 + 1): # i = num units in attacking country - attackers_left
+            for j in range(0, d1 - d2 + 1): # j = num units in defending country - defenders_left
                 if (i,j) == (0,0):
                     continue
                 a = i + a2 # number of units in attacking country
@@ -100,7 +100,8 @@ class RiskProbabilityCalculator:
                 p[i][j] = prob
         return p[a1 - a2][d1 - d2]
 
-    def probability_of_conquering_territory(self, (attackingCountry, defendingCountry, attackingStrategy)):
-        a1 = attackingCountry
-        d1 = defendingCountry
-        return sum([self.probability_when_attacking_territory((a,0),(a1,d1,attackingStrategy)) for a in range(2,a1+1)])
+    def probability_of_conquering_territory(self, (attacking_country, defending_country, attacking_strategy)):
+        a1 = attacking_country
+        d1 = defending_country
+        return sum([self.probability_when_attacking_territory((a,0),(a1,d1,attacking_strategy)) for a in range(2,a1+1)])
+
