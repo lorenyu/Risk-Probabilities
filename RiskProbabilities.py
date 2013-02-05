@@ -5,7 +5,7 @@ import strategies
 p = RiskProbabilityCalculator()
 
 def attack(args):
-    print p.expected(args.num_attackers, args.num_defenders)
+    print p.expected_armies_lost_when_attacking(args.num_attackers, args.num_defenders)
 
 def win_territory(args):
     if args.strategy == 'all-in':
@@ -16,7 +16,7 @@ def win_territory(args):
         strategy = strategies.outnumber
     else:
         strategy = strategies.all_in
-    print p.p2win((args.num_attackers, args.num_defenders, strategy))
+    print p.probability_of_conquering_territory((args.num_attackers, args.num_defenders, strategy))
 
 parser = argparse.ArgumentParser(description='Compute probabilities within the game of Risk.')
 
