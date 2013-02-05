@@ -24,9 +24,6 @@ class RiskProbabilityCalculator:
     def transition((num_attackers,num_defenders), (num_attackers_lost, num_defenders_lost)):
         print (num_attackers,num_defenders), (num_attackers_lost, num_defenders_lost)
 
-    def computePTransition((num_attackers,num_defenders), (num_attackers_lost, num_defenders_lost)):
-        pass
-
     def outcome(self, attackers, defenders):
         total_casualties = min(len(attackers), len(defenders))
         attackers = sorted(attackers, reverse=True)
