@@ -67,22 +67,22 @@ class RiskProbabilityCalculator:
             result = add(result, mult(prob, (attackers_lost, defenders_lost)))
         return result
 
-    def probability_when_attacking_territory(self, (attackers_left, defenders_left), (attacking_country, defending_country, attacking_strategy)):
-        def Sa(attacking_country, defending_country):
-            return min(3, attacking_country - 1, attacking_strategy(attacking_country, defending_country)) if (defending_country > 0 and attacking_country > 1) else 0
-        a1 = attacking_country # initial number of units in attacking country
-        d1 = defending_country # initial number of units in defending country
+    def probability_when_attacking_territory(self, (attackers_left, defenders_left), (num_armies_in_attacking_territory, num_armies_in_defending_territory, attacking_strategy)):
+        def Sa(num_armies_in_attacking_territory, num_armies_in_defending_territory):
+            return min(3, num_armies_in_attacking_territory - 1, attacking_strategy(num_armies_in_attacking_territory, num_armies_in_defending_territory)) if (num_armies_in_defending_territory > 0 and num_armies_in_attacking_territory > 1) else 0
+        a1 = num_armies_in_attacking_territory # initial number of units in attacking territory
+        d1 = num_armies_in_defending_territory # initial number of units in defending territory
         a2 = attackers_left # number of attacking units left
         d2 = defenders_left # number of defending units left
         p = [[0.0]*(d1 - d2 + 1) for i in range(a1 - a2 + 1)]
         p[0][0] = 1 if Sa(a2, d2) == 0 else 0
         
-        for i in range(0, a1 - a2 + 1): # i = num units in attacking country - attackers_left
-            for j in range(0, d1 - d2 + 1): # j = num units in defending country - defenders_left
+        for i in range(0, a1 - a2 + 1): # i = num units in attacking territory - attackers_left
+            for j in range(0, d1 - d2 + 1): # j = num units in defending territory - defenders_left
                 if (i,j) == (0,0):
                     continue
-                a = i + a2 # number of units in attacking country
-                d = j + d2 # number of units in defending country
+                a = i + a2 # number of units in attacking territory
+                d = j + d2 # number of units in defending territory
                 na = Sa(a, d) # num attackers
                 if na <= 0:
                     continue
@@ -100,8 +100,10 @@ class RiskProbabilityCalculator:
                 p[i][j] = prob
         return p[a1 - a2][d1 - d2]
 
-    def probability_of_conquering_territory(self, (attacking_country, defending_country, attacking_strategy)):
-        a1 = attacking_country
-        d1 = defending_country
+    def probability_of_conquering_territory(self, (num_armies_in_attacking_territory, num_armies_in_defending_territory, attacking_strategy)):
+        a1 = num_armies_in_attacking_territory
+        d1 = num_armies_in_defending_territory
         return sum([self.probability_when_attacking_territory((a,0),(a1,d1,attacking_strategy)) for a in range(2,a1+1)])
+
+
 
