@@ -1,3 +1,5 @@
+import strategies
+
 def add(x,y):
     return tuple(map(lambda ((a,b)): a+b, zip(x,y)))
 
@@ -105,5 +107,20 @@ class RiskProbabilityCalculator:
         d1 = num_armies_in_defending_territory
         return sum([self.probability_when_attacking_territory((a,0),(a1,d1,attacking_strategy)) for a in range(2,a1+1)])
 
+    def probability_of_conquering_territory_chain(self, (num_armies_in_attacking_territory, num_armies_in_defending_territories)):
+        a_0 = num_armies_in_attacking_territory
+        d = num_armies_in_defending_territories
+        n = len(d) # num territories in chain
+        p = [[0.0]*(a_0+1) for i in range(n+1)] # p[i][a] = probability of conquering territory chain ds[i:] (the last n-i territories) with a armies
+        p_a = self.probability_when_attacking_territory
 
+        for a_n in range(a_0+1):
+            p[n][a_n] = 1.0
+            # print 'p[%d][%d] = %f' % (n, a_n, p[i][a_n])
+        for i in reversed(range(n)):
+            for a_i in range(a_0+1):
+                p[i][a_i] = sum([p_a((a, 0), (a_i, d[i], strategies.all_in)) * p[i+1][a-1] for a in range(1,a_i+1)])
+                # print 'p[%d][%d] = %f' % (i, a_i, p[i][a_i])
+
+        return p[0][a_0]
 
