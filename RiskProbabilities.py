@@ -18,8 +18,11 @@ def win_territory(args):
         strategy = strategies.all_in
     print p.probability_of_conquering_territory((args.num_attackers, args.num_defenders, strategy))
 
-def win_territory_chain(args):
-    print p.probability_of_conquering_territory_chain((args.num_attackers, args.num_defenders))
+def win_territory_path(args):
+    print p.probability_of_conquering_territory_path((args.num_attackers, args.num_defenders))
+
+def expected_territory_path(args):
+    print p.expected_armies_left_when_attacking_territory_path((args.num_attackers, args.num_defenders))
 
 parser = argparse.ArgumentParser(description='Compute probabilities within the game of Risk.')
 
@@ -38,10 +41,15 @@ win_territory_parser.add_argument('-s', '--strategy', choices=['all-in', 'advant
     advantage:  Attack with as many units as possible as long as the number of units in the attacking territory, excluding the 1 unit you have to leave in the territory, outnumbers the number of units in the defending territory.""")
 win_territory_parser.set_defaults(func=win_territory)
 
-win_territory_chain_parser = subparsers.add_parser('win-territory-chain', help='Compute probability of winning a territory chain')
-win_territory_chain_parser.add_argument('num_attackers', type=int, help='Number of units in attacking territory')
-win_territory_chain_parser.add_argument('num_defenders', type=int, nargs='*', help='Number of units in defending territories in order of territory chain')
-win_territory_chain_parser.set_defaults(func=win_territory_chain)
+win_territory_path_parser = subparsers.add_parser('win-territory-path', help='Compute probability of winning a territory path')
+win_territory_path_parser.add_argument('num_attackers', type=int, help='Number of units in attacking territory')
+win_territory_path_parser.add_argument('num_defenders', type=int, nargs='*', help='Number of units in defending territories in order of territory path')
+win_territory_path_parser.set_defaults(func=win_territory_path)
+
+expected_territory_path_parser = subparsers.add_parser('expected-territory-path', help='Compute expected number of armies remaining when attacking a territory path')
+expected_territory_path_parser.add_argument('num_attackers', type=int, help='Number of units in attacking territory')
+expected_territory_path_parser.add_argument('num_defenders', type=int, nargs='*', help='Number of units in defending territories in order of territory path')
+expected_territory_path_parser.set_defaults(func=expected_territory_path)
 
 args = parser.parse_args()
 args.func(args)
