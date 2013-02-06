@@ -124,19 +124,27 @@ class RiskProbabilityCalculator:
 
     def expected_armies_left_when_attacking_territory_path(self, (num_armies_in_attacking_territory, num_armies_in_defending_territories)):
         a_0 = num_armies_in_attacking_territory
-        d = num_armies_in_defending_territories
-        n = len(d) # num territories in path
-        E = [[0.0]*(a_0+1) for i in range(n+1)] # E[i][a] = expected armies left when attacking territory path ds[i:] (the last n-i territories) with a armies
+        d_ = num_armies_in_defending_territories
+        n = len(d_) # num territories in path
+        E_a = [[0.0]*(a_0+1) for i in range(n+1)] # E[i][a] = expected attacking armies left when attacking territory path ds[i:] (the last n-i territories) with a armies
+        E_d = [[0.0]*(a_0+1) for i in range(n+1)] # E[i][a] = expected defending armies left when attacking territory path ds[i:] (the last n-i territories) with a armies
         p_a = self.probability_when_attacking_territory
 
         for a_n in range(a_0+1):
-            E[n][a_n] = a_n
+            E_a[n][a_n] = a_n
+            E_d[n][a_n] = 0.0
         for i in reversed(range(n)):
             for a_i in range(1, a_0+1):
-                # expected armies left = (probability of winning this territory with a troops left) * (1 + expected armies left of attacking rest of territories with a troops) +
-                #                        (probability of not winning this territory) * 1
-                probability_of_not_winning_this_territory = sum([p_a((1, defenders_left), (a_i, d[i], strategies.all_in)) for defenders_left in range(1,d[i]+1)])
-                E[i][a_i] = sum([p_a((a, 0), (a_i, d[i], strategies.all_in)) * (1 + E[i+1][a-1]) for a in range(1,a_i+1)]) + probability_of_not_winning_this_territory
-        return E[0][a_0]
+                # expected attacking armies left = sum_{a}(probability of winning this territory with a troops left) * (1 + expected armies left of attacking rest of territories with a troops) +
+                #                                  (probability of not winning this territory) * 1
+                probability_of_not_winning_this_territory = sum([p_a((1, d), (a_i, d_[i], strategies.all_in)) for d in range(1,d_[i]+1)])
+                E_a[i][a_i] = sum([p_a((a, 0), (a_i, d_[i], strategies.all_in)) * (1 + E_a[i+1][a-1]) for a in range(1,a_i+1)]) + probability_of_not_winning_this_territory
+                # print 'E_a[%d][%d] = %f' % (i, a_i, E_a[i][a_i])
+
+                # expected defending armies left = sum_{a}((probability of winning this territory with a troops left) * (expected defending armies left of attacking rest of territories with a troops)) +
+                #                                  sum_{d}((probability of not winning this territory with d defending troops left) * (total number of defending troops left))
+                E_d[i][a_i] = sum([p_a((a, 0), (a_i, d_[i], strategies.all_in)) * E_d[i+1][a-1] for a in range(1,a_i+1)]) + sum([p_a((1, d), (a_i, d_[i], strategies.all_in)) * (d + sum(d_[i+1:])) for d in range(1,d_[i]+1)])
+                # print 'E_d[%d][%d] = %f' % (i, a_i, E_d[i][a_i])
+        return E_a[0][a_0], E_d[0][a_0]
 
 
